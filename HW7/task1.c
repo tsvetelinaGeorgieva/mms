@@ -41,7 +41,7 @@ int secondMax(const int* arr, size_t n, int* secondMax){
     
     if(secMax != INT_MIN){
         *secondMax = secMax;
-        return secMax;
+        return 0;
     }else{
         return -1;
     }
