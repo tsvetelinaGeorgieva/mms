@@ -31,8 +31,13 @@ void swapBytes(uint16_t* word){
     }
     
     if(lastBit != firstBit){
-        *word ^= (1 << 0);
-        //*word ^= (1 << (sizeof(*word) * __CHAR_BIT__ - index));
+        if(lastBit == 0){
+            *word |= (1 << 0);
+            *word &= ~(1 << (sizeof(*word) * __CHAR_BIT__ - index));
+        }else{
+            *word &= ~(1 << 0);
+            *word |= (1 << (sizeof(*word) * __CHAR_BIT__ - index));
+        }
     }
 }
 
