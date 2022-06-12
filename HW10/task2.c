@@ -7,11 +7,11 @@ int16_t printbit(int16_t);
 
 int main(){
     uint16_t num;
-    uint16_t* p;
-    p = &num;
+    //uint16_t* p;
+    //p = &num;
     scanf("%hu", &num);
     printf("%hu\n", printbit(num));
-    swapBytes(p);
+    swapBytes(&num);
     printf("%hu\n", num);
     printf("%hu\n", printbit(num));
 
@@ -20,11 +20,19 @@ int main(){
 
 void swapBytes(uint16_t* word){
     int lastBit = !!(*word & (1 << 0));
-    int firstBit = !!(*word & (1 << (sizeof(*word) * __CHAR_BIT__ - 1)));
+    int firstBit, index;
+
+    for(int bit = sizeof(* word) * __CHAR_BIT__ - 1; bit >= 0; bit--){
+        if(!!(*word & (1 << bit))){
+            firstBit = !!(*word & (1 << bit));
+            index = bit;
+            break;
+        }
+    }
     
     if(lastBit != firstBit){
         *word ^= (1 << 0);
-        *word ^= (1 << (sizeof(*word) * __CHAR_BIT__ - 1));
+        //*word ^= (1 << (sizeof(*word) * __CHAR_BIT__ - index));
     }
 }
 
