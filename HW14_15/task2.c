@@ -6,18 +6,11 @@
 
 #define COUNT 3
 
-void push(Booklist**, char*, char*, int*, double*);
-void print_list(Booklist*);
-void listFree(Booklist**);
-int compTitle(const void*, const void*);
-void frontBackSplit(Booklist*, Booklist**, Booklist**);
-void mergeSort(Booklist**, int(*)(const void* , const void*));
-
 typedef struct Book{
     char title[151];
     char author[101];
     int pages;
-    double price
+    double price;
 } Book;
 
 typedef struct Booklist{
@@ -25,9 +18,16 @@ typedef struct Booklist{
     char author[101];
     int pages;
     double price;
-    struct Booklist* next
+    struct Booklist* next;
 } Booklist;
 
+void push(Booklist**, char*, char*, int, double);
+void print_list(Booklist*);
+void listFree(Booklist**);
+int compTitle(const void*, const void*);
+void frontBackSplit(Booklist*, Booklist**, Booklist**);
+void mergeSort(Booklist**, int(*)(const void* , const void*));
+Booklist* sortedMerge(Booklist*, Booklist*, int(*)(const void*, const void*));
 
 int main(){
     char fileName[50];
@@ -46,7 +46,7 @@ int main(){
             //printf("%s %s %d %.2lf\n", bookRead[i].title, bookRead[i].author, bookRead[i].pages, bookRead[i].price);
             push(&list,bookRead[i].title, bookRead[i].author, bookRead[i].pages, bookRead[i].price);
         }
-        mergeSort(list, compTitle);
+        mergeSort(&list, compTitle);
         print_list(list);
    // }
     //fclose(fp1);
@@ -68,17 +68,19 @@ int main(){
 
     fclose(fp1);
     fclose(fp2);
-    listFree(list);
+    listFree(&list);
 
     return 0;
 }
 
 
 
-void push(Booklist** list, char title[], char author[], int *pages, double *price){
+void push(Booklist** list, char title[], char author[], int pages, double price){
     Booklist* n = malloc(sizeof(Booklist));
-    n->title = title;
-    n->author = author;
+    strcpy(title, n->title);
+    //n->title = *title;
+    strcpy(author, n->author);
+    //n->author = *author;
     n->pages = pages;
     n->price = price;
     n->next = *list;
@@ -135,4 +137,22 @@ void mergeSort(Booklist** list, int(*cmp)(const void*, const void*)){
     mergeSort(&front, cmp);
     mergeSort(&back, cmp);
     *list = sortedMerge(front, back, cmp);
+}
+
+Booklist* sortedMerge(Booklist* listA, Booklist* listB, int(*cmp)(const void*, const void*)){
+    Booklist* sorted = NULL;
+    if (listA == NULL){
+        return listB;
+    }
+    if (listB == NULL){
+        return listA;
+    }
+    if (cmp(listA->title, listB->title) > 0){
+        sorted = listA;
+        sorted->next = sortedMerge(listA->next, listB, cmp);
+    } else {
+        sorted = listB;
+        sorted->next = sortedMerge(listA, listB->next, cmp);
+    }
+    return sorted;
 }
