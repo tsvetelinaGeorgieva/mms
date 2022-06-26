@@ -9,6 +9,7 @@ int randInt(int, int);
 void randomStr(char*);
 
 int main(int argc, char **argv){
+    srand(time(NULL));
     int N = atoi(argv[1]);
     for (int i = 0; i < N; i++){
         pid_t pid = fork();
