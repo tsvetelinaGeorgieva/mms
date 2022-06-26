@@ -6,46 +6,41 @@
 #include <time.h>
 
 
-int main(int argc, char **argv){
+int main(int argc, char** argv){
     int fd[2];
+    
     if(pipe(fd) == -1){
         perror("pipe");
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     }
-    
-        pid_t pid = fork();
-        if (-1 == pid){
-            perror("fork");
-            return EXIT_FAILURE;
+
+    pid_t pid = fork();
+
+    if (0 == pid){
+        // child
+        close(fd[0]);
+        int num, sumChild = 0;
+        for(int i = 1; i < argc / 2; i++){
+            sscanf(argv[i], "%d", &num);
+            sumChild += num;
         }
-        if (0 == pid){
-            int sumCh = 0;
-            int *sum;
-            sum = &sumCh;
-            for(int i = 1; i < argc/2; i++){
-                sumCh += atoi(argv[i]);
-            }
-            //printf("sumCh: %d ", sumCh);
-            close(fd[0]);
-            write(fd[1], sum, sizeof(int));
-            close(fd[1]);
-        }else{
-            
-            int n, sumP = 0;
-            int* sum;
-            close(fd[1]);
-            read(fd[0], sum, sizeof(int));
-            //printf("sumP: %d ", *sum);
-            for(int i = argc/2; i < argc; i++){
-                sumP += atoi(argv[i]);
-            }
-            sumP += *sum;
-            printf("sumP: %d ", sumP);
+        write(fd[1], &sumChild, sizeof(sumChild));
+        close(fd[1]);
+    } else {
+        // parent
+        close(fd[1]);
+        int num, sumParent;
+        for(int j = argc / 2; j < argc; j++){
+            sscanf(argv[j], "%d", &num);
+            sumParent += num;
         }
-    
-    for (int i = 0; i < argc; i++){
         wait(NULL);
+        int sumChild;
+        read(fd[0], &sumChild, sizeof(sumChild));
+        close(fd[0]);
+        int sum = sumParent + sumChild;
+        printf("Sum: %d\n", sum);
     }
+
     return EXIT_SUCCESS;
 }
-
